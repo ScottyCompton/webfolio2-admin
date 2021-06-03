@@ -1,26 +1,27 @@
+import AppRouter from '../routes/AppRouter';
+import {loginUser} from '../appData/uiSlice';
 import {useAppDispatch} from '../hooks/redux-hooks';
-import {useEffect} from 'react';
-import {loadPortfolioData, loadCategoryData} from '../appData/portfolioActions';
-import PortCatList from './PortCatList';
 
 
 const App:React.FC = () => {
-  //const portfolio = useAppSelector(state => state.portfolio);
   const dispatch = useAppDispatch();
+  const jwt = localStorage.getItem('jwt');
 
-  useEffect(() => {
-    dispatch(loadCategoryData());
-    dispatch(loadPortfolioData());
-  }, [dispatch])
+  if(jwt && jwt.length !== 0) {
+    let loginPayload = {
+      isAuthenticated: true,
+      jwt
+  }
+  
+    dispatch(loginUser(loginPayload));
+  }
+
+
+
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <div className="heading"></div>
-        <PortCatList />
-      </header>
-    </div>
+    <AppRouter />
   );
 }
 
-export default App;
+export default App

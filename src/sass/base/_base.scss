@@ -1,3 +1,4 @@
+/*
 *,
 *::after,
 *::before {
@@ -5,13 +6,39 @@
     padding: 0;
     box-sizing: inherit;
 }
+*/
 
-html {
-    // this defines what 1rem is...
-    font-size: 62.5%;
+.fade-appear,
+.fade-enter {
+    opacity: 0;
+    z-index: 1;
 }
 
-body {
-    padding: 3rem;
-    box-sizing: border-box;
+.page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    overflow-x: hidden;
+    // @media screen and (min-width: $xs-breakpoint) {
+    //     overflow-x: inherit;
+    // }
+}
+
+.fade-appear-active,
+.fade-enter.fade-enter-active {
+    opacity: 1.0;
+    transition: opacity 600ms linear 150ms;
+}
+
+.fade-exit {
+    opacity: 1.0;
+}
+
+.fade-exit.fade-exit-active {
+    opacity: 0;
+    transition: opacity 600ms linear;
+    .hide-on-nav {
+        visibility: hidden;
+    }
 }

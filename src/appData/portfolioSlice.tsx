@@ -1,45 +1,5 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-//import {RootState} from './appData'
-
-
-// interfaces
-
-interface CatSortOrder {
-    _id: string,
-    sortOrder: number,
-    catId: string
-}
-
-export interface PortfolioCategory {
-    _id: string;
-    category: string;
-    catId: string;
-}
-
-export interface PortfolioItem {
-    _id: string;
-    published: boolean;
-    auxImgs: string[];
-    githubUrl: string;
-    longDesc: string;
-    shortDesc: string;
-    projectTitle: string;
-    projectUrl: string;
-    techSpecs: string;
-    previewImg: string;
-    auxImgAspectRatio:string;
-    cso: CatSortOrder[];
-}
-
-export interface SortablePortfolioItem extends PortfolioItem {
-    sortOrder: number;
-}
-
-interface PortfolioState {
-    items: PortfolioItem[];
-    categories: PortfolioCategory[]
-}
-
+import {PortfolioCategory, PortfolioState, PortfolioItem} from '../interfaces';
 
 
 const initialState: PortfolioState = {
@@ -63,6 +23,10 @@ const portSlice = createSlice({
             state.items = action.payload;
         },
 
+        updatePortfolioDisplayOrder(state, action: PayloadAction<PortfolioItem[]>) {
+            // update the cso arrays for the items in the array
+            state.items = action.payload;
+        },
 
         updatePortItem(state, action) {
             // saves changes to the portfoli item
@@ -99,7 +63,8 @@ export const {
     deletePortItem, 
     createPortfolioItem,
     togglePublished,
-    loadPortCats
+    loadPortCats,
+    updatePortfolioDisplayOrder
 } = actions;
 
 export default reducer; 

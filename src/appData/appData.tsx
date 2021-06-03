@@ -1,10 +1,11 @@
 import {configureStore} from '@reduxjs/toolkit';
-//import uiSlice from './ui-slice';
 import portfolioSliceReducer from './portfolioSlice';
+import uiSliceReducer from  './uiSlice';
 
 export const appData = configureStore({
     reducer: {
-        portfolio: portfolioSliceReducer
+        portfolio: portfolioSliceReducer,
+        ui: uiSliceReducer
     }
 })
 
