@@ -1,10 +1,18 @@
 //import {uiActions} from '../ui-slice';
-import {loadPortfolio, loadPortCats, updatePortfolioDisplayOrder} from './portfolioSlice';
+import {loadPortfolio, 
+    loadPortCats, 
+    updatePortfolioDisplayOrder, 
+    togglePublished, 
+    updatePortItem, 
+    deleteAuxImage, 
+    uploadAuxImage,
+    updatePreviewImage,
+    deletePortItem} from './portfolioSlice';
 import {PortfolioItem, PortfolioCategory} from '../interfaces';
 import {getData, putData} from '../helpers/handleHttp';
 
 
-export const loadCategoryData = (cb:any) => {
+export const portfolioActions_loadCategoryData = (cb:any) => {
     return async (dispatch: any) => {   
         try {
             const portCats: PortfolioCategory[] = await getData('categories');
@@ -25,18 +33,21 @@ export const loadCategoryData = (cb:any) => {
     }
 }
 
-export const moveCso = (portfolioId: string, adjacentId: string, categoryId: string, direction: string = 'moveup') => {
+export const portfolioActions_moveCso = (portfolioId: string, adjacentId: string, categoryId: string, direction: string = 'moveup') => {
 
     return async (dispatch: any) => {
         try {
 
-            const body = {
+         
+            const putConfig = {
+                body: {
                     categoryId,
                     portfolioId,
                     adjacentId
                 }
+            }
 
-            const payload = await putData(`portfolio/${direction}`, body);   
+            const payload = await putData(`portfolio/${direction}`, putConfig);   
             dispatch(updatePortfolioDisplayOrder(payload));
 
         } catch (error) {
@@ -52,16 +63,10 @@ export const moveCso = (portfolioId: string, adjacentId: string, categoryId: str
     }
 }
 
-export const moveDownCso = (_id: string) => {
-
-}
 
 
 
-
-
-
-export const loadPortfolioData = () => {
+export const portfolioActions_loadPortfolioData = () => {
     return async (dispatch: any) => { 
         try {
             const portData:PortfolioItem[] = await getData('portfolio');
@@ -80,45 +85,157 @@ export const loadPortfolioData = () => {
 }
 
 
+export const portfolioActions_togglePublished = (portfolioId: string|null, cb: any ) => {
 
-// export const sendCartData = (cart) => {
-//     return async (dispatch) => {
-//         dispatch(uiActions.showNotification({
-//             status: 'Pending',
-//             title: 'Sending...',
-//             message: 'Sending cart data'
-//           }))
+    return async (dispatch: any) => { 
+        try {
 
+            const putConfig = {
+                method: 'PATCH',
+                body: {}
+            }
 
-//         const sendRequest = async () => {
-//             const response = await fetch('https://react-http-7e6e2-default-rtdb.firebaseio.com/cart.json', 
-//             {method: 'PUT', body: JSON.stringify({
-//                 items: cart.items,
-//                 totalQuantity: cart.totalQuantity
-//             })})
+            const payload = await putData(`portfolio/publish/${portfolioId}`,putConfig);
+            dispatch(togglePublished(payload));
+            
+            if(cb) {
+                await cb(payload)
+            }
 
-//             if(!response.ok) {
-//                 throw new Error('Problem sending cart data');
-//             }
-//         }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
-//         try {
-//             await sendRequest();
-
-//             dispatch(uiActions.showNotification({
-//                 status: 'Success',
-//                 title: 'Success',
-//                 message: 'Sent cart data successfully'
-//               }))        
-//         } catch (error) {
-//             dispatch(uiActions.showNotification({
-//                 status: 'Error',
-//                 title: 'Error',
-//                 message: 'Could not send cart data'
-//               }))
-//         }
-//     }
-// }
+}
 
 
+export const portfolioActions_updatePortItem = (portfolioData: PortfolioItem, cb: any) => {
+    return async (dispatch: any) => { 
+        try {
 
+            const putConfig = {
+                body: portfolioData,
+                method: 'PATCH'
+            };
+
+            const payload = await putData(`portfolio/${portfolioData._id}`,putConfig);
+            dispatch(updatePortItem(payload));
+            
+            if(cb) {
+                await cb(payload)
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
+    }    
+}
+
+
+
+export const portfolioActions_deleteAuxImage = (portfolioId: string, auxImgId: string, cb: any) => {
+    return async (dispatch: any) => {
+        try {
+
+            const putConfig = {
+                method: 'DELETE'
+            };
+
+            const auxImgs = await putData(`portfolio/${portfolioId}/auximg/${auxImgId}`, putConfig);
+            const payload = {
+                _id: portfolioId,
+                auxImgs            
+            }
+            dispatch(deleteAuxImage(payload));
+            
+            if(cb) {
+                await cb(auxImgs)
+            }
+
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+}
+
+
+export const portfolioActions_uploadAuxImage =  (portfolioId: string, formData: any, cb?: any) => {
+
+
+    return async (dispatch: any) => {
+        try {
+
+            const putConfig = {
+                body: formData,
+                contentType: 'none'
+            }
+            
+
+            const auxImgs = await putData(`portfolio/${portfolioId}/auximg`, putConfig)
+            const payload = {
+                _id: portfolioId,
+                auxImgs
+            }
+            dispatch(uploadAuxImage(payload));
+            
+            if(cb) {
+                await cb(auxImgs)
+            }            
+
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
+}
+
+
+
+export const portfolioActions_uploadPreviewImage = (portfolioId: string, formData: any, cb: any) => {
+    return async (dispatch:any) => {
+        try {
+            const putConfig = {
+                body: formData,
+                contentType: 'none'
+            }
+
+            const response = await putData(`portfolio/${portfolioId}/previewimg`, putConfig)
+            const payload = {
+                _id: portfolioId,
+                previewImgUrl: response.previewImgUrl
+            }
+            dispatch(updatePreviewImage(payload));
+            
+            if(cb) {
+                await cb(payload.previewImgUrl)
+            }            
+
+        } catch (error) {
+            console.log(error)
+        }
+    }
+}
+
+
+export const portfolioActions_deletePortItem = (portfolioId: string) => {
+    return async (dispatch:any) => {
+        try {
+            const putConfig = {
+                body: {},
+                method: 'DELETE'
+            }
+
+            const response = await putData(`portfolio/${portfolioId}`, putConfig)
+            const payload = {
+                _id: response._id
+            }
+            dispatch(deletePortItem(payload));
+                 
+
+        } catch (error) {
+            console.log(error)
+        }        
+    }
+}

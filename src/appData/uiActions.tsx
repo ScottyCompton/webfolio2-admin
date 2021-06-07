@@ -6,7 +6,9 @@ import {AuthResultData} from '../interfaces';
 export const executeLogout = () => {
 
     return async (dispatch: any) => {
-        await putData('users/logout',{}).then(() => {
+        const putConfig = {};
+
+        await putData('users/logout',putConfig).then(() => {
             localStorage.removeItem('jwt');
             dispatch(logoutUser())
         });
@@ -17,11 +19,15 @@ export const executeLogout = () => {
 export const executeLogin = (email:string, password: string) => {
     return async (dispatch: any) => {
         try {
-            const body = {
-                email,
-                password
-            };
-           const authResult: AuthResultData = await putData('users/login',body);
+
+            const putConfig = {
+                body: {
+                    email,
+                    password
+                }
+            }
+
+           const authResult: AuthResultData = await putData('users/login',putConfig);
 
             let loginPayload = {
                 isAuthenticated: (authResult.token && authResult.token.length !== 0) ? true : false,

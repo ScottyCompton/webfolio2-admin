@@ -6,7 +6,7 @@ import CatSelect from '../components/UI/CatSelect';
 import {SortablePortfolioItem} from '../interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { useHistory, withRouter } from "react-router-dom";
-import {moveCso, loadPortfolioData, loadCategoryData} from '../appData/portfolioActions';
+import {portfolioActions_moveCso, portfolioActions_loadPortfolioData, portfolioActions_loadCategoryData} from '../appData/portfolioActions';
 import PortCatListItem from '../components/PortCatListItem';
 
 
@@ -21,11 +21,11 @@ const PortCatList:React.FC = () => {
     useEffect(() => {
             if (!portCats || portCats.length === 0) {
                                 
-                dispatch(loadCategoryData((x:any) => {
+                dispatch(portfolioActions_loadCategoryData((x:any) => {
                     setCategoryId(x[0]._id);
                 }))
             .then(() => {
-                dispatch(loadPortfolioData())
+                dispatch(portfolioActions_loadPortfolioData())
             });    
         }
 
@@ -45,14 +45,14 @@ const PortCatList:React.FC = () => {
     const handleMoveUpClick = (displayOrder: number) => {
         const portfolioId = filteredList[displayOrder]._id;
         const adjacentId =  filteredList[displayOrder - 1]._id;
-        dispatch(moveCso(portfolioId, adjacentId, categoryId, 'moveup'));
+        dispatch(portfolioActions_moveCso(portfolioId!, adjacentId!, categoryId, 'moveup'));
     }
 
 
     const handleMoveDownClick = (displayOrder: number) => {
         const portfolioId = filteredList[displayOrder]._id;
         const adjacentId =  filteredList[displayOrder + 1]._id;
-        dispatch(moveCso(portfolioId, adjacentId, categoryId, 'movedown'));
+        dispatch(portfolioActions_moveCso(portfolioId!, adjacentId!, categoryId, 'movedown'));
     }
 
     const displayFilteredCats = () => {

@@ -1,5 +1,5 @@
 import {PortfolioCatItemProps} from '../interfaces'
-
+import PortfolioImage from '../components/UI/PortfolioImage';
 
 const PortCatListItem:React.FC<PortfolioCatItemProps> = (props) => {
     const {portfolioItem, displayOrder, firstRow, lastRow, handleMoveUpClick, handleMoveDownClick, handleEditClick} = props;
@@ -17,14 +17,20 @@ const PortCatListItem:React.FC<PortfolioCatItemProps> = (props) => {
         if(e.target.classList.contains('btn')) {
             return false;
         };
-        handleEditClick(_id)
+        if(_id) {
+            handleEditClick(_id)
+        }
+        
     }
 
     return (
 
         <li onClick={doEdit} className="portCatList__item list-group-item d-flex justify-content-between align-items-center" style={{margin:'.2rem 0'}}>
             <div style={{width:'20rem'}}>
-                <img className="portCatList__image" src={previewImgUrl} alt={projectTitle} />&nbsp; {projectTitle}
+                { <PortfolioImage
+                id={`portCatList__image--${_id}`}  
+                src={previewImgUrl}
+                className="portCatList__image" /> }&nbsp; {projectTitle}
             </div>
             <div>
                 {published && <span className="text-success">Published &nbsp; </span>}

@@ -29,12 +29,40 @@ const portSlice = createSlice({
         },
 
         updatePortItem(state, action) {
-            // saves changes to the portfoli item
-            
+            // saves changes to the portfolio item            
+            const itemIdx = state.items.findIndex(item => item._id === action.payload._id)
+            if(itemIdx !== -1) {
+                state.items[itemIdx] = action.payload;
+            }
+        },
+
+        updatePreviewImage(state, action) {
+            const itemIdx =  state.items.findIndex(item => item._id === action.payload._id)
+            if(itemIdx !== -1) {
+                state.items[itemIdx].previewImgUrl = action.payload.previewImgUrl;
+            }
+        },
+
+
+        uploadAuxImage(state, action) {
+            const itemIdx =  state.items.findIndex(item => item._id === action.payload._id)
+            if(itemIdx !== -1) {
+                state.items[itemIdx].auxImgs = action.payload.auxImgs;
+            }
+        },
+
+        deleteAuxImage(state, action) {
+            const itemIdx =  state.items.findIndex(item => item._id === action.payload._id)
+            if(itemIdx !== -1) {
+                state.items[itemIdx].auxImgs = action.payload.auxImgs;
+            }
         },
 
         deletePortItem(state, action) {
-            // delete a portfolio item
+            const itemIdx =  state.items.findIndex(item => item._id === action.payload._id)
+            if(itemIdx !== -1) {
+                state.items.splice(itemIdx, 1);
+            }
             
         },
         
@@ -45,7 +73,12 @@ const portSlice = createSlice({
         },
 
         togglePublished(state, action) {
-            // toggles the published state of a portflio item
+            const itemIdx = state.items.findIndex(item => item._id === action.payload._id)
+            if(itemIdx !== -1) {
+                state.items[itemIdx].published = action.payload.published;
+            }
+            
+
         }
 
     }
@@ -64,7 +97,10 @@ export const {
     createPortfolioItem,
     togglePublished,
     loadPortCats,
-    updatePortfolioDisplayOrder
+    updatePortfolioDisplayOrder,
+    deleteAuxImage,
+    uploadAuxImage,
+    updatePreviewImage
 } = actions;
 
 export default reducer; 

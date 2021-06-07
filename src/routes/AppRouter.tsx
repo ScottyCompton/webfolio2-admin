@@ -5,13 +5,10 @@ import Portfolio from '../pages/Portfolio';
 import PortfolioEdit from '../pages/PortfolioEdit';
 import SettingsEdit from '../pages/SettingsEdit'
 import Login from '../pages/Login';
-import Header from '../layout/Header';
-import Footer from '../layout/Footer';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import {createBrowserHistory} from 'history';
-
-
-
 
 export const history = createBrowserHistory();
 
@@ -32,7 +29,7 @@ const AppRouter:React.FC = (props) => {
               >
             <main>
                 <div className="page">
-                <Header />
+                {isAuthenticated && <Header />}
                 <Switch location={location}>
                     <Route path="/" exact={true}>
                         {!isAuthenticated ? <Redirect to="/login" /> : <Portfolio />}
@@ -41,7 +38,7 @@ const AppRouter:React.FC = (props) => {
                     <Route path="/settings" exact={true} component={SettingsEdit} />                                    
                     <Route path="/login" exact={true} component={Login} />                                    
                 </Switch>
-                <Footer />
+                {isAuthenticated && <Footer />}
                 </div>
             </main>
               </CSSTransition>

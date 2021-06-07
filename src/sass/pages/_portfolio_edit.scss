@@ -1,0 +1,49 @@
+.portfolio-edit {
+    &-mainimg {
+        &__btn {
+            font-size: .6rem;
+            transform: translateX(-.5rem) translateY(50%);
+            &--addedit {
+                transform: translateY(-.9rem);
+                &-container {
+                    width: 100%;
+                    float: left;
+                }
+            }
+        }
+    }
+    &-auximg {
+        &__card-body {
+            padding: .5rem 0;
+        }
+        &__container {
+            overflow-y: auto;
+            max-height: 310px;
+            overflow-x: hidden;
+        }
+        &__img {
+            width: 50px;
+            height: 50px;
+        }
+        &__btn {
+            font-size: .6rem;
+            transform: translateX(-.5rem) translateY(50%);
+            &--addnew {
+                transform: translateY(-.9rem);
+                &-container {
+                    width: 100%;
+                    float: left;
+                }
+            }
+        }
+        &__row {
+            padding: .2rem 0;
+            &:nth-child(odd) {
+                background-color: darken($dark, 5%);
+            }
+        }
+        &__aspect-ratio {
+            width: 50px;
+        }
+    }
+}

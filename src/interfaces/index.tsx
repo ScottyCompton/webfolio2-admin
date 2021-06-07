@@ -2,8 +2,16 @@ export interface PortCatListProps {
     category: PortfolioCategory;
 }
 
+export interface PortCatCheckboxProps {
+    //csoArray: CatSortOrder[];
+    checked: boolean;
+    id: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    category: string;
+}
+
 export interface CatSortOrder {
-    _id: string,
+    _id?: string,
     displayOrder: number,
     category_id: string
 }
@@ -22,13 +30,24 @@ export interface PortfolioCatItemProps {
     firstRow: boolean;
     lastRow: boolean;
     displayOrder: number;
+
+}
+
+export interface PortfolioEditorProps {
+    portfolioId: string;
+    location: any;
+}
+
+export interface PortfolioAuxImg {
+    _id?: string | null | undefined;
+    auxImgUrl?: string;
 }
 
 
 export interface PortfolioItem {
-    _id: string;
+    _id: string | null | undefined;
     published: boolean;
-    auxImgs: string[];
+    auxImgs: PortfolioAuxImg[];
     githubUrl: string;
     longDesc: string;
     shortDesc: string;
@@ -37,6 +56,7 @@ export interface PortfolioItem {
     techSpecs: string;
     previewImgUrl: string;
     cso: CatSortOrder[];
+    auxImgAspectRatio?: string | null;
 }
 
 export interface SortablePortfolioItem extends PortfolioItem {
