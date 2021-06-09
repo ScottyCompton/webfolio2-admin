@@ -1,0 +1,91 @@
+.settings {
+    &-sliderimgs {
+        &__card-body {
+            padding: .5rem 0;
+        }
+        &__sort-arrow-button {
+            float: right;
+            font-family: webdings;
+            border: none;
+            background-color: transparent;
+            font-size: 2.0rem;
+            margin: 0;
+            padding: 0;
+            width: 20px;
+            height: 1.0rem;
+        }
+        &__container {
+            overflow-y: auto;
+            max-height: 400px;
+            overflow-x: hidden;
+        }
+        &__img {
+            &--landscape {
+                width: 75px;
+                height: auto;
+                transform: translateY(50%);
+            }
+            &--portrait {
+                height: 50px;
+                width: auto;
+            }
+        }
+        &__radio {
+            transform: translateY(1rem);
+        }
+        &__btn {
+            font-size: .6rem;
+            transform: translateX(-.5rem) translateY(50%);
+            &--addnew {
+                transform: translateY(-.9rem);
+                &-container {
+                    width: 100%;
+                    float: left;
+                }
+            }
+        }
+        &__row {
+            padding: .2rem 0;
+            height: 4.0rem;
+            &:nth-child(odd) {
+                background-color: darken($dark, 5%);
+            }
+        }
+        &__aspect-ratio {
+            width: 50px;
+        }
+        &__btn-orientation {
+            &--portrait {
+                width: 15px;
+                padding: 2px;
+                margin-left: 23px;
+            }
+            &--landscape {
+                height: 15px;
+            }
+            &-container {
+                float: right;
+                height: 30px;
+            }
+            &-text {
+                &--landscape {
+                    display: inline-block;
+                    transform: translateY(1px);
+                }
+            }
+        }
+    }
+    &-aboutimg {
+        &__btn {
+            font-size: .6rem;
+            transform: translateX(-.5rem) translateY(50%);
+            &--addedit {
+                transform: translateY(-.9rem);
+                &-container {
+                    width: 100%;
+                    float: left;
+                }
+            }
+        }
+    }
+}

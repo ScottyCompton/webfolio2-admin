@@ -3,11 +3,15 @@ import {useState, useEffect} from 'react';
 import {useAppDispatch} from '../hooks/redux-hooks';
 import {Container, Row, Col} from 'react-bootstrap';
 import CatSelect from '../components/UI/CatSelect';
-import {SortablePortfolioItem} from '../interfaces';
+import {PortfolioItem, NewPortfolioItem, SortablePortfolioItem} from '../interfaces';
 import { v4 as uuidv4 } from 'uuid';
 import { useHistory, withRouter } from "react-router-dom";
-import {portfolioActions_moveCso, portfolioActions_loadPortfolioData, portfolioActions_loadCategoryData} from '../appData/portfolioActions';
+import {portfolioActions_moveCso, 
+        portfolioActions_loadPortfolioData, 
+        portfolioActions_loadCategoryData,
+        portfolioActions_createPortfolioItem} from '../appData/portfolioActions';
 import PortCatListItem from '../components/PortCatListItem';
+
 
 
 const PortCatList:React.FC = () => {
@@ -20,7 +24,6 @@ const PortCatList:React.FC = () => {
 
     useEffect(() => {
             if (!portCats || portCats.length === 0) {
-                                
                 dispatch(portfolioActions_loadCategoryData((x:any) => {
                     setCategoryId(x[0]._id);
                 }))
@@ -37,6 +40,31 @@ const PortCatList:React.FC = () => {
         setCategoryId(catId);
     }
 
+
+    const handleAddNewClick = () => {
+
+        let csoArray:any = [];
+        portCats.forEach((cat) => {
+            csoArray.push({
+                category_id: cat._id,
+                displayOrder: -1
+            })
+        })
+
+        const portfolioData:NewPortfolioItem = {
+            projectTitle: 'Your Spiffy New Project',
+            published: false,
+            cso: csoArray
+        }
+
+        const doRedir = (retval:PortfolioItem) => {
+            const _id = retval._id;
+            history.push(`portfolio/${_id}`);
+        }
+
+        dispatch(portfolioActions_createPortfolioItem(portfolioData, doRedir))
+
+    }
 
     const handleEditClick = (id:string) => {
         history.push('/portfolio/' + id)
@@ -108,8 +136,8 @@ const PortCatList:React.FC = () => {
     return (
         <Container>
             <Row>
-                <Col xs="9"><h5 className="float-right">Select Category:</h5></Col>
-                <Col xs="3"><CatSelect onChangeHandler={showPortfolioItems} catId={categoryId}  /></Col>                
+                <Col xs="5"><h5 style={{display:'inline-block'}} className="float-left">Select Category: &nbsp; </h5> <CatSelect onChangeHandler={showPortfolioItems} catId={categoryId}  /></Col>
+                <Col xs="7"><button onClick={handleAddNewClick} className="btn btn-primary float-right">Add New...</button></Col>
             </Row>
             <Row>
                 <Col xs="12">

@@ -16,7 +16,7 @@ const CatSelect:React.FC<CatSelectProps> = (props) => {
     return (
         <fieldset>
                 <div className="form-group">
-                <select className="form-control float-right" id="catSelect" value={catId} onChange={onChange}>
+                <select className="form-control float-left" id="catSelect" value={catId} onChange={onChange}>
                     {cats.map((cat) => {
                         return (
                             <option key={Math.random().toString()} value={cat._id}>{cat.category}</option>

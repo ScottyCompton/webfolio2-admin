@@ -10,7 +10,7 @@ const PortCatCheckbox:React.FC<PortCatCheckboxProps> = (props) => {
 
     return (
         <label>
-            <input  type="checkbox" checked={checked} onChange={onChange} name="portcat" id={id} value={id} />{category}
+            <input className="portCatCheckbox" type="checkbox" checked={checked} onChange={onChange} name="portcat" id={id} value={id} />{category}
         </label>
     );    
 }

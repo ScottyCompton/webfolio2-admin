@@ -44,6 +44,14 @@ export interface PortfolioAuxImg {
 }
 
 
+export interface NewPortfolioItem {
+    projectTitle: string;
+    published: boolean;
+    cso: CatSortOrder[];
+
+}
+
+
 export interface PortfolioItem {
     _id: string | null | undefined;
     published: boolean;
@@ -56,7 +64,7 @@ export interface PortfolioItem {
     techSpecs: string;
     previewImgUrl: string;
     cso: CatSortOrder[];
-    auxImgAspectRatio?: string | null;
+    auxImgAspectRatio: string | null;
 }
 
 export interface SortablePortfolioItem extends PortfolioItem {
@@ -83,4 +91,33 @@ export interface AuthResultData {
         name: string;
     };
     token: string;
+}
+
+export interface PortfolioImageProps {
+    src: string;
+    id: string;
+    altText?: string;
+    style?: any;
+    className?: string;
+    defaultImg?: string;
+}
+
+export interface AppImageProps {
+    src: string;
+    id: string;
+    altText?: string;
+    style?: any;
+    className?: string;
+    defaultImg?: string;
+}
+
+
+
+export interface SliderImage {
+    _id: string;
+    src: string;
+    orientation: string;
+    displayOrder: number;
+    isForeground: boolean;
+
 }

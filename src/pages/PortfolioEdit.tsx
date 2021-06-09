@@ -1,19 +1,22 @@
 import {Row, Col, Container, Tabs, Tab} from 'react-bootstrap';
 import {useAppSelector, useAppDispatch} from '../hooks/redux-hooks';
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useHistory, withRouter } from "react-router-dom";
 import PortCatCheckbox from '../components/UI/PortCatCheckbox';
+import {appIsLoading} from '../appData/uiSlice';
 import {
     portfolioActions_togglePublished, 
     portfolioActions_updatePortItem, 
     portfolioActions_deletePortItem,
     portfolioActions_deleteAuxImage,
     portfolioActions_uploadAuxImage,
-    portfolioActions_uploadPreviewImage
+    portfolioActions_uploadPreviewImage,
+    portfolioActions_loadCategoryData,
+    portfolioActions_loadPortfolioData
     } from '../appData/portfolioActions';
 import { PortfolioItem, PortfolioAuxImg, PortfolioEditorProps } from '../interfaces';
-import PortfolioImage from '../components/UI/PortfolioImage';
+import AppImage from '../components/UI/AppImage';
 
 
 
@@ -22,32 +25,73 @@ import PortfolioImage from '../components/UI/PortfolioImage';
 const PortfolioEdit:React.FC<PortfolioEditorProps|any> = (props) => {
     const {location} = props;
     const portfolioId = location.pathname.split('/')[2];
-    const history = useHistory();
 
     const portItem = useAppSelector(state => state.portfolio.items.find(item => item._id === portfolioId));
     const portCats = useAppSelector(state => state.portfolio.categories);
 
     const dispatch = useAppDispatch();
     const auxImgDataRef = useRef<HTMLInputElement>(null);
+
     const [auxImgDataVal, setAuxImgDataVal] = useState('');
-
     const previewImgDataRef = useRef<HTMLInputElement>(null);
+    
     const [previewImgDataVal, setPreviewImgDataVal] = useState('');
+    const history = useHistory();
 
-    const [portItemState, setPortItemState] = useState({
-        _id: portItem ? portItem._id : null,
-        projectTitle: portItem ? portItem.projectTitle : '',
-        shortDesc: portItem ? portItem.shortDesc: '',
-        longDesc: portItem ? portItem.longDesc : '',
-        techSpecs : portItem ? portItem.techSpecs : '',
-        cso: portItem ? portItem.cso : [],
-        projectUrl: portItem ? portItem.projectUrl : '',
-        githubUrl: portItem ? portItem.githubUrl : '',
-        previewImgUrl: portItem ? portItem.previewImgUrl : 'dist/images/blank_img.jpg',
-        published: portItem ? portItem.published : false,
-        auxImgAspectRatio: portItem ? portItem.auxImgAspectRatio : null,
-        auxImgs: portItem ?  portItem.auxImgs : []
-    });
+    const getPortItemObj = () => {
+        return (
+            {
+                _id: portItem ? portItem._id : null,
+                projectTitle: portItem ? portItem.projectTitle : '',
+                shortDesc: portItem ? portItem.shortDesc: '',
+                longDesc: portItem ? portItem.longDesc : '',
+                techSpecs : portItem ? portItem.techSpecs : '',
+                cso: portItem ? portItem.cso : [],
+                projectUrl: portItem ? portItem.projectUrl : '',
+                githubUrl: portItem ? portItem.githubUrl : '',
+                previewImgUrl: portItem ? portItem.previewImgUrl : 'dist/images/blank_img.jpg',
+                published: portItem ? portItem.published : false,
+                auxImgAspectRatio: portItem ? portItem.auxImgAspectRatio : null,
+                auxImgs: portItem ?  portItem.auxImgs : []
+            }
+        )
+    }
+
+
+    const [portItemState, setPortItemState] = useState(getPortItemObj());
+
+    
+    // if the page refresheds the portfolo needs to be reloaded for some reason...
+    useEffect(() => {
+
+        if (!portCats || portCats.length === 0) {
+            dispatch(portfolioActions_loadCategoryData(null))
+            .then(() => {
+                dispatch(portfolioActions_loadPortfolioData())
+            }).then(() => {
+//                dispatch(appIsLoaded());
+            })          
+        }
+    }, [dispatch, portCats])     
+
+
+
+    useEffect(() => {
+        const reloadPortfolioItem = async () => {
+            setPortItemState(getPortItemObj())
+        }
+
+        if(portItem === undefined && portItemState._id === null) {
+            dispatch(appIsLoading())
+        }
+
+        if (portItem !== undefined && portItemState._id === null) {
+            reloadPortfolioItem();
+
+        }
+
+    })
+
 
 
     const handleSubmit = (e:React.FormEvent<HTMLFormElement>) => {
@@ -140,6 +184,7 @@ const PortfolioEdit:React.FC<PortfolioEditorProps|any> = (props) => {
     const togglePortCat = (e: React.ChangeEvent<HTMLInputElement>) => {
         const category_id = e.target.id;
 
+
         const updatedState = portItemState;
         const csoArray = updatedState.cso.slice();
         let csoIdx = csoArray.findIndex(csoItem => csoItem.category_id === category_id)
@@ -153,8 +198,13 @@ const PortfolioEdit:React.FC<PortfolioEditorProps|any> = (props) => {
             })
 
         } else {
-            // exists - remove it
-            csoArray.splice(csoIdx,1);
+            if(csoArray.length === 1)  {
+                alert('You must have at least one category selected');
+                e.target.checked = true
+            } else {
+                // exists - remove it
+                csoArray.splice(csoIdx,1);
+            }
         }
         setPortItemState((prevState) => {
             return (
@@ -252,14 +302,13 @@ const PortfolioEdit:React.FC<PortfolioEditorProps|any> = (props) => {
         <Container>
             <form id="frmPortfolio" onSubmit={handleSubmit}>
             <Row>
-                <Col xs="9">
+                <Col xs="8">
                 <div className="card bg-secondary mb-3">
                     <div className="card-header text-white">
-                        {!portItem && <h4 className="float-left">Add New Portfolio Item</h4>}
                         {portItem && <h4 className="float-left">Edit Portfolio Item</h4>}
                         <div className="form-group float-right text-white">
-                            {(!portItem || !portItemState.published) && <><span>This Item Is Unpublished</span> <button onClick={togglePublished} className="btn btn-success btn-sm">Publish</button></>}
-                            {(portItem && portItemState.published) && <><span>This Item Is Published</span> <button onClick={togglePublished} className="btn btn-danger btn-sm">Unublish</button></>}
+                            {(!portItem || !portItemState.published) && <><span>This Item Is Unpublished</span> <button type="button" onClick={togglePublished} className="btn btn-success btn-sm">Publish</button></>}
+                            {(portItem && portItemState.published) && <><span>This Item Is Published</span> <button type="button" onClick={togglePublished} className="btn btn-danger btn-sm">Unublish</button></>}
                         </div>
 
                     </div>
@@ -313,36 +362,43 @@ const PortfolioEdit:React.FC<PortfolioEditorProps|any> = (props) => {
                     </div>
                 </div>                    
                 </Col>
-                <Col xs="3">
+                <Col xs="4">
                     <Tabs defaultActiveKey="mainImg" id="portItemSidebar"> 
                         <Tab key={uuidv4()} eventKey="mainImg" title="Main Image">
                             <div className="card bg-dark mb-3">
+                                <div className="card-header text-white">
+                                    <div className="portfolio-edit-mainimg__btn--addedit-container"><button type="button" id="addEditMainImg" onClick={handleSetPreviewImgUploadData} className="float-right portfolio-edit-mainimg__btn portfolio-edit-mainimg__btn--addedit btn btn-success btn-sm ">Replace Main Image</button></div>
+                                </div>
                                 <div className="card-body">
-                                    { <PortfolioImage  
+                                    { <AppImage  
                                         id={`previewimg_${portItemState._id}`}
                                         src={portItemState.previewImgUrl}
                                         style={{width: '100%', height: 'auto'}} /> }
                                 </div>
                             </div>
-                            <div className="portfolio-edit-mainimg__btn--addedit-container"><button type="button" id="addEditMainImg" onClick={handleSetPreviewImgUploadData} className="float-right portfolio-edit-mainimg__btn portfolio-edit-mainimg__btn--addedit btn btn-success btn-sm ">Replace Main Image</button></div>
 
                         </Tab>
                         <Tab key={uuidv4()} eventKey="auxImgs" title="Aux Images">
-                        <div className="card bg-dark mb-3">
+                            <div className="card bg-dark mb-3">
+                                <div className="card-header text-white">
+                                    <button type="button" id="addAuxImg" onClick={handleSetAuxImgUploadData} className="float-right portfolio-edit-auximg__btn portfolio-edit-auximg__btn--addnew btn btn-success btn-sm ">Upload Aux Image</button>
+                                </div>
+
                                 <div className="card-body portfolio-edit-auximg__card-body">
+
                                     <Container className="portfolio-edit-auximg__container">
                                     {portItemState.auxImgs.map((img, index) => {
                                         return (
                                         <Row key={uuidv4()} className={`portfolio-edit-auximg__row`}>
-                                            <Col xs="6">
-                                            {(img._id && img.auxImgUrl) && <PortfolioImage
+                                            <Col xs="8">
+                                            {(img._id && img.auxImgUrl) && <AppImage
                                                     id={`auximg_${img._id}`}
                                                     src={img.auxImgUrl}
                                                     className="portfolio-edit-auximg__img"
                                                     />}
                                             </Col>
-                                            <Col xs="3"><button type="button" id={`auximg_preview_${img._id}`} onClick={handlePreviewAuxImgClick} className="portfolio-edit-auximg__btn btn btn-primary btn-sm ">Preview</button></Col>
-                                            <Col xs="3"><button type="button" id={`auximg_delete_${img._id}`} onClick={handleDeleteAuxImgClick} className="portfolio-edit-auximg__btn btn btn-danger btn-sm">Delete</button></Col>
+                                            <Col xs="2"><button type="button" id={`auximg_preview_${img._id}`} onClick={handlePreviewAuxImgClick} className="portfolio-edit-auximg__btn btn btn-primary btn-sm ">Preview</button></Col>
+                                            <Col xs="2"><button type="button" id={`auximg_delete_${img._id}`} onClick={handleDeleteAuxImgClick} className="portfolio-edit-auximg__btn btn btn-danger btn-sm">Delete</button></Col>
                                         </Row>
                                         )
                                     })}
@@ -357,20 +413,23 @@ const PortfolioEdit:React.FC<PortfolioEditorProps|any> = (props) => {
                                     </Container>
                                 </div>
                             </div>
-                            <div className="portfolio-edit-auximg__btn--addnew-container">
-                                <button type="button" id="addAuxImg" onClick={handleSetAuxImgUploadData} className="float-right portfolio-edit-auximg__btn portfolio-edit-auximg__btn--addnew btn btn-success btn-sm ">Upload Aux Image</button></div>
+                        </Tab>
+
+                        <Tab key={uuidv4()} eventKey="portCats" title="Categories">
+                            <div className="card bg-dark mb-3">
+                                <div className="card-header text-white">
+                                    Portfolio Categories
+                                </div>
+                                <div className="card-body text-white">
+                                    <fieldset>
+                                            {portCatSelects()}
+                                    </fieldset>
+                                </div>
+                            </div>
+
                         </Tab>
                     </Tabs>
-                    <div className="card bg-secondary mb-3">
-                        <div className="card-header text-white">
-                            Portfolio Categories
-                        </div>
-                        <div className="card-body text-white">
-                            <fieldset>
-                                    {portCatSelects()}
-                            </fieldset>
-                        </div>
-                    </div>
+
 
                     <div className="form-group">
                         <div className="col-12-xs">

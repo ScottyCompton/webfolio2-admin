@@ -7,8 +7,10 @@ import {loadPortfolio,
     deleteAuxImage, 
     uploadAuxImage,
     updatePreviewImage,
+    createPortfolioItem,
     deletePortItem} from './portfolioSlice';
-import {PortfolioItem, PortfolioCategory} from '../interfaces';
+import {appIsLoading, appIsLoaded} from './uiSlice';
+import {PortfolioItem, PortfolioCategory, NewPortfolioItem} from '../interfaces';
 import {getData, putData} from '../helpers/handleHttp';
 
 
@@ -69,8 +71,10 @@ export const portfolioActions_moveCso = (portfolioId: string, adjacentId: string
 export const portfolioActions_loadPortfolioData = () => {
     return async (dispatch: any) => { 
         try {
+            dispatch(appIsLoading())
             const portData:PortfolioItem[] = await getData('portfolio');
-            dispatch(loadPortfolio(portData));
+            dispatch(loadPortfolio(portData))
+            dispatch(appIsLoaded())
 
         } catch (error) {
             console.log(error);
@@ -107,6 +111,30 @@ export const portfolioActions_togglePublished = (portfolioId: string|null, cb: a
         }
     }
 
+}
+
+export const portfolioActions_createPortfolioItem = (portfolioData: NewPortfolioItem, cb: any) => {
+    return async (dispatch: any) => {
+        try {
+            const putConfig = {
+                body: portfolioData,
+                method: 'POST'
+            }
+
+            const payload = await putData('portfolio', putConfig);
+            dispatch(createPortfolioItem(payload))
+
+            if(cb) {
+                await cb(payload)
+            }
+            
+            
+        } catch (error) {
+
+        }
+
+
+    }
 }
 
 

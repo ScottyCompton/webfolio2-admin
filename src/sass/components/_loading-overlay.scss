@@ -1,0 +1,24 @@
+.loading-overlay {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0;
+    background-color: #000;
+    z-index: -10;
+    overflow: hidden;
+    transition: all .5s ease-in;
+    &__inner {
+        position: relative;
+        left: 50%;
+        top: 50%;
+    }
+    &__spinner {
+        width: 100px;
+        height: 100px;
+        transform: translateX(-50%);
+    }
+    &--loading {
+        opacity: 0.5;
+        z-index: 10;
+    }
+}

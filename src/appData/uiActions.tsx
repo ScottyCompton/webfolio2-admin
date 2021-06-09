@@ -1,5 +1,5 @@
 import {putData} from '../helpers/handleHttp';
-import {loginUser, logoutUser} from './uiSlice';
+import {loginUser, logoutUser, appIsLoading, appIsLoaded} from './uiSlice';
 import {AuthResultData} from '../interfaces';
 
 

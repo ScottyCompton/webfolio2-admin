@@ -1,9 +1,9 @@
 .portCatList {
-    .portCatList__image {
+    &__image {
         width: 3rem;
         height: 4.5rem;
     }
-    .portCatItem__btn {
+    &__btn {
         margin: 0 .1rem;
         &--moveUp {
             transform: rotateX(180deg);
@@ -13,5 +13,12 @@
         border-color: transparent;
         background-color: #303030;
         cursor: pointer;
+    }
+    &__functions {
+        width: 20rem;
+        text-align: right;
+    }
+    &__categories {
+        text-align: center;
     }
 }

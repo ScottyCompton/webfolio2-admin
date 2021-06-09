@@ -7,11 +7,11 @@ interface LoginPayloadAction {
     jwt: string|null;
 }
 
-
 interface uiState {
     isAuthenticated: boolean;
     notification: string|null;
     jwt: string|null;
+    isLoading: boolean;
 }
 
 
@@ -19,8 +19,8 @@ interface uiState {
 const initialState: uiState = {
     isAuthenticated: false,
     notification: null,
-    jwt: null
-
+    jwt: null,
+    isLoading: false
 }
 
 
@@ -36,7 +36,17 @@ const uiSlice = createSlice({
         logoutUser(state) {
             state.isAuthenticated = false;
             state.jwt = null;
+        },
+
+        appIsLoading(state) {
+            state.isLoading = true;
+        },
+
+        appIsLoaded(state) {
+            state.isLoading = false;
         }
+
+
 
     } 
     
@@ -44,5 +54,5 @@ const uiSlice = createSlice({
 
 
 const {actions, reducer} = uiSlice;
-export const {loginUser, logoutUser} = actions;
+export const {loginUser, logoutUser, appIsLoaded, appIsLoading} = actions;
 export default reducer;

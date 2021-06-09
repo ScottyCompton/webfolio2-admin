@@ -68,8 +68,7 @@ const portSlice = createSlice({
         
 
         createPortfolioItem(state, action) {
-          // insert a new portfolio item
-
+          state.items.push(action.payload)
         },
 
         togglePublished(state, action) {
