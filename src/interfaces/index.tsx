@@ -121,3 +121,11 @@ export interface SliderImage {
     isForeground: boolean;
 
 }
+
+
+export interface PortfolioSliderImg {
+    _id: string;
+    sliderImgUrl: string;
+    orientation: 'portrait' | 'landscape';
+    isForeground: boolean
+}

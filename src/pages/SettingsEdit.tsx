@@ -4,6 +4,7 @@ import {getData, putData} from '../helpers/handleHttp';
 import AppImage from '../components/UI/AppImage';
 import {v4 as uuidv4} from 'uuid';
 
+
 const SettingsEdit:React.FC = () => {
     
     const sliderImgDataRef = useRef<HTMLInputElement>(null);
@@ -15,7 +16,7 @@ const SettingsEdit:React.FC = () => {
 
     const [sliderImgs, updateSliderImgs ] = useState([{
         _id: '',
-        src: '',
+        sliderImgUrl: '',
         orientation: '',
         displayOrder: 0,
         isForeground: false
@@ -34,6 +35,7 @@ const SettingsEdit:React.FC = () => {
             instagramId: '',
             linkedinUsername: '',
             resumeUrl: '',
+            skypeId: '',
             siteTitle: '',
             twitterHandle: '',
             youTubeId: ''
@@ -125,6 +127,36 @@ const SettingsEdit:React.FC = () => {
     }
 
     const handleSliderImgUploadChange = (e:any) => {
+        const formData = new FormData();
+        const imgData = e.target?.files[0]
+
+        // const reloadSliderImgs = (retval: PortfolioSliderImg[]) => {
+        //     updateSliderImgs((prevState) => {
+        //         return ()
+        //     })
+        // }
+
+        if(imgData !== '') {
+            formData.append( 
+              "sliderImgData", 
+              imgData
+            ); 
+         
+            const putConfig = {
+                method: 'POST',
+                contentType: 'none',
+                body: formData
+            }
+
+            putData(`sliderimgs/${sliderImgOrientation}`, putConfig).then((retval) => {
+                updateSliderImgs(retval);
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+            setSliderImgDataVal('');
+        }
+        
 
     }
 
@@ -163,6 +195,8 @@ const SettingsEdit:React.FC = () => {
             }).catch((error) => {
                 console.log(error);
             });
+
+            setAboutImgDataVal('')
         }
     }
 
@@ -211,7 +245,7 @@ const SettingsEdit:React.FC = () => {
                         </Col>
                         <Col xs="3">
                             <AppImage 
-                            src={img.src}
+                            src={img.sliderImgUrl}
                             id={img._id}
                             className={`settings-sliderimgs__img--${sliderImgOrientation}`} />
                         </Col>
@@ -335,9 +369,16 @@ const SettingsEdit:React.FC = () => {
                                 </div>
                             </div>
 
+                            <div className="form-group">
+                                <label htmlFor="skypeId" className="col-form-label">Skype Id</label>
+                                <div className="col-12-xs">
+                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="skypeId" value={settings.skypeId} />
+                                </div>
+                            </div>
+
 
                             <div className="form-group">
-                                <label htmlFor="twitterHandle" className="col-form-label">Instagram Id</label>
+                                <label htmlFor="twitterHandle" className="col-form-label">Twitter Handle</label>
                                 <div className="col-12-xs">
                                     <input type="text" className="form-control" onChange={handleTextUpdate} id="twitterHandle" value={settings.twitterHandle} />
                                 </div>
