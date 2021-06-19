@@ -37,6 +37,7 @@ const AppRouter:React.FC = (props) => {
                     <Route path="/portfolio/:id" component={PortfolioEdit} />
                     <Route path="/settings" exact={true} component={SettingsEdit} />                                    
                     <Route path="/login" exact={true} component={Login} />                                    
+                    <Route component={PortfolioEdit} />
                 </Switch>
                 {isAuthenticated && <Footer />}
                 </div>

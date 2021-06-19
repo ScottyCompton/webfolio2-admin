@@ -3,7 +3,7 @@ import {Link} from 'react-router-dom';
 import {useAppSelector, useAppDispatch} from '../../hooks/redux-hooks';
 import {withRouter, useHistory } from "react-router-dom";
 import {executeLogout} from '../../appData/uiActions';
-
+import {Container} from 'react-bootstrap';
 
 const Header:React.FC = () => {
     const isAuthenticated = useAppSelector(state => state.ui.isAuthenticated)
@@ -18,15 +18,17 @@ const Header:React.FC = () => {
     }
 
     return (
-        <header className="main-header text-white bg-light">
-            <nav>
-                <ul>
-                    {isAuthenticated && <li><Link to="/">Portfolio</Link></li>}
-                    {isAuthenticated && <li><Link to="/settings">Settings</Link></li>}
-                    {isAuthenticated && <li><Link to="#" onClick={doLogout}>Logout</Link></li>}
-                </ul>
-            </nav>
-        </header>
+        <Container>
+            <header className="main-header text-white bg-light">
+                <nav>
+                    <ul>
+                        {isAuthenticated && <li><Link to="/">Portfolio</Link></li>}
+                        {isAuthenticated && <li><Link to="/settings">Settings</Link></li>}
+                        {isAuthenticated && <li><Link to="#" onClick={doLogout}>Logout</Link></li>}
+                    </ul>
+                </nav>
+            </header>
+        </Container>
     );
 }
 

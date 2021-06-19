@@ -1,0 +1,15 @@
+.contact-item__form {
+    &--input {
+        font-size: 0.8rem;
+    }
+    &--btn {
+        font-size: 0.7rem;
+    }
+    &--arrow {
+        font-family: 'Webdings';
+        font-size: 1.7rem;
+    }
+    &--arrowlink:hover {
+        text-decoration: none;
+    }
+}

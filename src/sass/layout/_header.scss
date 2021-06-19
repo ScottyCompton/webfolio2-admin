@@ -1,5 +1,18 @@
 header.main-header {
-    height: 10vh;
+    height: 60px;
     margin-bottom: 10vh;
     display: block;
+    ul {
+        list-style: none;
+        float: right;
+        li {
+            display: inline-block;
+            padding: 10px;
+            &:not(:last-child) {
+                &::after {
+                    content: " | "
+                }
+            }
+        }
+    }
 }

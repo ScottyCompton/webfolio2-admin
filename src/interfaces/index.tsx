@@ -129,3 +129,29 @@ export interface PortfolioSliderImg {
     orientation: 'portrait' | 'landscape';
     isForeground: boolean
 }
+
+
+export interface ContactItem {
+    name: string;
+    displayValue: string;
+    linkUrl: string;
+    faPrefix: string;
+    fontAwesomeIcon: string;
+    _id?: string;
+}
+
+
+export interface ContactItemFormProps {
+    name?: string;
+    displayValue?: string;
+    linkUrl?: string;
+    faPrefix?: string;
+    fontAwesomeIcon?: string;
+    _id?: string;
+    handleDelete?: (e:any) => void;
+    handleUpdate?: (e:any) => void;
+    handleCreate?: (e:any) => void;
+    handleMove?: (id: string, e:any) => void;
+    showUpArrow?: boolean;
+    showDownArrow?: boolean;
+}

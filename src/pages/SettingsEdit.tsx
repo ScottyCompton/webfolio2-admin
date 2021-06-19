@@ -1,8 +1,11 @@
 import {Container, Row, Col, Tabs, Tab} from 'react-bootstrap';
-import {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {getData, putData} from '../helpers/handleHttp';
 import AppImage from '../components/UI/AppImage';
 import {v4 as uuidv4} from 'uuid';
+import ContactItemForm from '../components/UI/ContactItemForm';
+import {ContactItem} from '../interfaces'
+import { DefaultEditor as Editor } from 'react-simple-wysiwyg';
 
 
 const SettingsEdit:React.FC = () => {
@@ -11,6 +14,7 @@ const SettingsEdit:React.FC = () => {
     const aboutImgDataRef = useRef<HTMLInputElement>(null);
     const [sliderImgDataVal, setSliderImgDataVal] = useState('');
     const [aboutImgDataVal, setAboutImgDataVal] = useState('');
+    const [useEditor, setUseEditor] = useState(true);
     const [sliderImgOrientation, setSliderImgOrientation] = useState('landscape');
 
 
@@ -23,22 +27,24 @@ const SettingsEdit:React.FC = () => {
     
     }])
 
+    const [contactItems, updateContactItems] = useState([
+        {
+            _id: '',
+            name: '',
+            displayValue: '',
+            linkUrl: '',
+            faPrefix: '',
+            fontAwesomeIcon: ''
+        }
+    ])
+
     const [settings, updateSettings] = useState(
         {
             aboutBlurb: '',
             aboutImgUrl: '',
             aboutTitle: '',
-            contactEmail: '',
-            contactPhone: '',
-            facebookId: '',
-            githubId: '',
-            instagramId: '',
-            linkedinUsername: '',
-            resumeUrl: '',
-            skypeId: '',
             siteTitle: '',
-            twitterHandle: '',
-            youTubeId: ''
+            resumeUrl: ''
         }
     );
 
@@ -46,8 +52,7 @@ const SettingsEdit:React.FC = () => {
     useEffect(() => {
         getData('settings').then((retval) => {
             updateSettings(retval)
-        });
-
+        })
     }, [])
 
 
@@ -57,6 +62,13 @@ const SettingsEdit:React.FC = () => {
             updateSliderImgs(retval)
         });
 
+    }, [])
+
+
+    useEffect(() => {
+        getData('contactitems').then((retval) => {
+                updateContactItems(retval);
+        })
     }, [])
 
 
@@ -130,12 +142,6 @@ const SettingsEdit:React.FC = () => {
         const formData = new FormData();
         const imgData = e.target?.files[0]
 
-        // const reloadSliderImgs = (retval: PortfolioSliderImg[]) => {
-        //     updateSliderImgs((prevState) => {
-        //         return ()
-        //     })
-        // }
-
         if(imgData !== '') {
             formData.append( 
               "sliderImgData", 
@@ -207,6 +213,125 @@ const SettingsEdit:React.FC = () => {
     }
 
 
+    const handleContactItemMove = (_id:string, direction:number) => {
+        const moveIdx = contactItems.findIndex(item => item._id === _id)
+
+        if(moveIdx !== -1) {
+            //updateContactItems((prevState) => {
+                const aryItems = contactItems.slice();
+                const itemToMove = aryItems.splice(moveIdx, 1)
+                aryItems.splice(moveIdx + direction, 0, itemToMove[0]);
+
+                
+                const putConfig = {
+                    method: 'PATCH',
+                    body: aryItems
+                };  
+        
+                putData(`contactitems`, putConfig).then((retval) => {
+                    updateContactItems(retval);
+                }).catch((error) => {
+                    console.log(error);
+                });
+            //})
+        }
+    }
+
+
+    const handleDeleteContactItem = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const target = e.target as HTMLButtonElement;
+        const elemId = target?.id;
+        const _id = elemId.replace('btnDelete_','');
+
+        const putConfig = {
+            method: 'DELETE'
+        };  
+
+        putData(`contactitems/${_id}`, putConfig).then((retval) => {
+            updateContactItems((prevState) => {
+                return (prevState.filter((item:ContactItem) => item._id !== retval._id));                
+            }) 
+        }).catch((error) => {
+            console.log(error);
+        });
+
+
+    }
+
+
+
+
+    const handleCreateContactItem = (contactItem:ContactItem) => {
+        
+        if(contactItem) {
+            const putConfig = {
+                method: 'POST',
+                body: {
+                    name: contactItem.name,
+                    displayValue: contactItem.displayValue,
+                    linkUrl: contactItem.linkUrl,
+                    faPrefix: contactItem.faPrefix,
+                    fontAwesomeIcon: contactItem.fontAwesomeIcon
+                }
+            };  
+    
+            putData(`contactitems`, putConfig).then((retval) => {
+                updateContactItems((prevState) => {
+                    return (
+                        [...prevState, retval]
+                    )
+                })
+            }).catch((error) => {
+                console.log(error);
+            });
+    
+        }
+
+      
+
+    }
+
+
+
+
+
+    const handleUpdateContactItem = (contactItem:ContactItem) => {
+        const _id = contactItem._id;
+
+        if(contactItem) {
+            const putConfig = {
+                method: 'PUT',
+                body: {
+                    name: contactItem.name,
+                    displayValue: contactItem.displayValue,
+                    linkUrl: contactItem.linkUrl,
+                    faPrefix: contactItem.faPrefix,
+                    fontAwesomeIcon: contactItem.fontAwesomeIcon
+                }
+            };  
+    
+            putData(`contactitems/${_id}`, putConfig).then((retval) => {
+                alert('Contact item updated');
+                // updateContactItems((prevState) => {
+                //     return (prevState.filter((item:ContactItem) => item._id !== retval._id));                
+                // }) 
+            }).catch((error) => {
+                console.log(error);
+            });
+    
+        }
+
+      
+
+    }
+
+
+
+    const toggleEditor = (e:any) => {
+        e.preventDefault();
+        setUseEditor(!useEditor);
+    }
+
 
     const handleSaveSettings = (e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -264,6 +389,17 @@ const SettingsEdit:React.FC = () => {
     }
 
 
+    const handleEditorChange = (e:React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
+        const aboutBlurb = e.target.value;
+        updateSettings((prevState) => {
+            return (
+                {...prevState,
+                aboutBlurb}
+            )
+        })
+    }
+
+
 
 
     const handleTextUpdate = (e:React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -291,48 +427,31 @@ const SettingsEdit:React.FC = () => {
                             <h4>Edit General Settings</h4>
                         </div>
                         <div className="card-body text-white">
-                        <div className="form-group">
+							<div className="form-group">
                                 <label htmlFor="siteTitle" className="col-form-label">Site Title</label>
                                 <div className="col-12-xs">
                                     <input type="text" className="form-control" onChange={handleTextUpdate} id="siteTitle" value={settings.siteTitle} />
                                 </div>
                             </div>
 
-    
                             <div className="form-group">
                                 <label htmlFor="aboutTitle" className="col-form-label">About Title</label>
                                 <div className="col-12-xs">
                                     <input type="text" className="form-control" onChange={handleTextUpdate} id="aboutTitle" value={settings.aboutTitle} />
                                 </div>
                             </div>
-
-
+							
+							
                             <div className="form-group">
                                 <label htmlFor="aboutBlurb" className="col-form-label">Homepage "About" Blurb</label>
                                 <div className="col-12-xs">
-                                    <textarea className="form-control" rows={10} onChange={handleTextUpdate} id="aboutBlurb" value={settings.aboutBlurb} />
+                                    <div><a href="#toggle" className="float-right" onClick={toggleEditor}>Toggle Editor</a></div>
+                                    {useEditor && <div style={{width: '100%', float: 'left'}}><Editor  value={settings.aboutBlurb} id="aboutBlurb" onChange={handleEditorChange} /></div>}
+                                    {!useEditor && <textarea className="form-control" rows={10} onChange={handleTextUpdate} id="aboutBlurb" value={settings.aboutBlurb} />}
                                 </div>
                             </div>                            
-
-                            <div className="form-group">
-                                <label htmlFor="contactEmail" className="col-form-label">Contact Email</label>
-                                <div className="col-12-xs">
-                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="contactEmail" value={settings.contactEmail} />
-                                </div>
-                            </div>
-
-
-
-                            <div className="form-group">
-                                <label htmlFor="contactPhone" className="col-form-label">Contact Phone</label>
-                                <div className="col-12-xs">
-                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="contactPhone" value={settings.contactPhone} />
-                                </div>
-                            </div>
-
-
-
-
+							
+							
                             <div className="form-group">
                                 <label htmlFor="resumeUrl" className="col-form-label">Resume Url</label>
                                 <div className="col-12-xs">
@@ -340,56 +459,35 @@ const SettingsEdit:React.FC = () => {
                                 </div>
                             </div>
 
-
                             <div className="form-group">
-                                <label htmlFor="githubId" className="col-form-label">Github Url</label>
-                                <div className="col-12-xs">
-                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="githubId" value={settings.githubId} />
-                                </div>
+                                <label className="col-form-label">Contact Methods:</label>
                             </div>
+                            <Container fluid>
+                            {(contactItems && contactItems.length !== 0 )&& contactItems.map((item, index) => {
 
+                                    item.linkUrl = item.linkUrl === null ? '' : item.linkUrl;
+
+                                    return (
+                                    <ContactItemForm 
+                                        key={uuidv4()} 
+                                        {...item} 
+                                        handleDelete={handleDeleteContactItem}
+                                        handleUpdate={handleUpdateContactItem}
+                                        handleMove={handleContactItemMove}
+                                        showUpArrow={index !== 0}
+                                        showDownArrow={index!== contactItems.length-1}
+                                        />                                        
+                                )
+                            })}
+                            
+                            </Container>
                             <div className="form-group">
-                                <label htmlFor="facebookId" className="col-form-label">Facebook Id</label>
-                                <div className="col-12-xs">
-                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="facebookId" value={settings.facebookId} />
-                                </div>
+                                <label className="col-form-label">Add another contact method below:</label>
                             </div>
-
-                            <div className="form-group">
-                                <label htmlFor="linkedinUsername" className="col-form-label">LinkedIn Username</label>
-                                <div className="col-12-xs">
-                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="linkedinUsername" value={settings.linkedinUsername} />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="instagramId" className="col-form-label">Instagram Id</label>
-                                <div className="col-12-xs">
-                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="instagramId" value={settings.instagramId} />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="skypeId" className="col-form-label">Skype Id</label>
-                                <div className="col-12-xs">
-                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="skypeId" value={settings.skypeId} />
-                                </div>
-                            </div>
-
-
-                            <div className="form-group">
-                                <label htmlFor="twitterHandle" className="col-form-label">Twitter Handle</label>
-                                <div className="col-12-xs">
-                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="twitterHandle" value={settings.twitterHandle} />
-                                </div>
-                            </div>
-
-                            <div className="form-group">
-                                <label htmlFor="youTubeId" className="col-form-label">YouTube Id</label>
-                                <div className="col-12-xs">
-                                    <input type="text" className="form-control" onChange={handleTextUpdate} id="youTubeId" value={settings.youTubeId} />
-                                </div>
-                            </div>
+                            <Container fluid>                                                          
+                                <ContactItemForm 
+                                    handleCreate={handleCreateContactItem} />                                        
+                            </Container>
 
                         </div>
                     </div>
